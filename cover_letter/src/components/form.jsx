@@ -36,6 +36,59 @@ export default function Form() {
             setLoading(false);
         }
     }
+
+    const downloadAsTxt = () => {
+        const blob = new Blob([letter], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'cover_letter.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const downloadAsDocx = () => {
+        // Create a simple HTML representation for Word
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <title>Cover Letter</title>
+            </head>
+            <body>
+                <pre style="font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; white-space: pre-wrap;">${letter}</pre>
+            </body>
+            </html>
+        `;
+        const blob = new Blob([htmlContent], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'cover_letter.doc';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    const downloadAsPdf = () => {
+        // Create a printable window
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>Cover Letter</title>');
+        printWindow.document.write('<style>body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.6; padding: 40px; white-space: pre-wrap; }</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(letter);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
+    };
+
   return (
     <div>
       <div className="form-container">
@@ -81,6 +134,17 @@ export default function Form() {
             onChange={(e) => setLetter(e.target.value)}
             rows="20"
           />
+          <div className="download-buttons">
+            <button onClick={downloadAsPdf} className="download-btn">
+              Download as PDF
+            </button>
+            <button onClick={downloadAsDocx} className="download-btn">
+              Download as DOC
+            </button>
+            <button onClick={downloadAsTxt} className="download-btn">
+              Download as TXT
+            </button>
+          </div>
         </div>
       )}
     </div>
